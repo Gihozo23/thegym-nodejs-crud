@@ -18,14 +18,12 @@ const writeDataToFile = (data) => {
 
 // GET request to fetch all items
 app.get("/get-items", (request, response) => {
-  console.log("The request method: ", request.method);
   const items = readDataFromFile();
   response.status(200).json(items);
 });
 
 // POST request to add a new item
 app.post("/post-items", (request, response) => {
-  console.log("The request method: ", request.method);
   const newItem = {
     id: uuidv4(),
     ...request.body,
@@ -43,21 +41,19 @@ app.post("/post-items", (request, response) => {
 
 //PUT request to update an existing item
 app.put("/items/:id", (request, response) => {
-  console.log("The request method: ", request.method, request.params);
   const { id } = request.params;
-  const updatedBody = request.body;
+  const updatedItemBody = request.body;
   const items = readDataFromFile();
   const updatedIndex = items.findIndex((item) => item.id === id);
   if (updatedIndex === -1)
     return response.status(404).json({ message: "Item not found" });
-  items[updatedIndex] = { id, ...updatedBody };
+  items[updatedIndex] = { id, ...updatedItemBody };
   writeDataToFile(items);
   response.status(200).json(items[updatedIndex]);
 });
 
 // DELETE request to delete an exisiting item
 app.delete("/delete-items/:id", (request, response) => {
-  console.log("The request method: ", request.method, request.params);
   const { id } = request.params;
 
   const items = readDataFromFile();
