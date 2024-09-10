@@ -7,9 +7,13 @@ const PORT = 3000;
 
 app.use(express.json());
 const dataFilePath = path.join(__dirname, "data.json");
+
 const readDataFromFile = () => {
-  const data = fs.readFileSync(dataFilePath, "utf8");
+  const data = fs.readFileSync(dataFilePath);
   return JSON.parse(data);
+};
+const writeDataToFile = (data) => {
+  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 };
 
 // GET request to fetch all items
@@ -18,10 +22,8 @@ app.get("/get-items", (request, response) => {
   const items = readDataFromFile();
   response.status(200).json(items);
 });
-const writeDataToFile = (data) => {
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-};
-// POST new item
+
+// POST request to add a new item
 app.post("/post-items", (request, response) => {
   console.log("The request method: ", request.method);
   const newItem = {
@@ -38,7 +40,8 @@ app.post("/post-items", (request, response) => {
   writeDataToFile(items);
   response.status(201).json(newItem);
 });
-//PUT update an existing element
+
+//PUT request to update an existing item
 app.put("/items/:id", (request, response) => {
   console.log("The request method: ", request.method, request.params);
   const { id } = request.params;
@@ -52,7 +55,7 @@ app.put("/items/:id", (request, response) => {
   response.status(200).json(items[updatedIndex]);
 });
 
-// DELETE
+// DELETE request to delete an exisiting item
 app.delete("/delete-items/:id", (request, response) => {
   console.log("The request method: ", request.method, request.params);
   const { id } = request.params;
@@ -65,8 +68,9 @@ app.delete("/delete-items/:id", (request, response) => {
     return response.status(404).json({ message: "file was not found" });
 
   writeDataToFile(remainingItems);
-  response.status(202).json({ message: "item successfully deleted" });
+  response.status(204).json({ message: "item successfully deleted" });
 });
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
