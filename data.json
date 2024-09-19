@@ -8,5 +8,10 @@
     "id": "d5fedc0f-6a5f-4071-b386-55807a252c0e",
     "name": "New Item",
     "description": "This is a new item"
+  },
+  {
+    "id": "2e4b89e0-8913-45df-a9e4-5a11710b8279",
+    "name": "New Item",
+    "description": "This is the posted item"
   }
 ]

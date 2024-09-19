@@ -6,6 +6,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
 const dataFilePath = path.join(__dirname, "data.json");
 
 const readDataFromFile = () => {
@@ -13,26 +14,22 @@ const readDataFromFile = () => {
   return JSON.parse(data);
 };
 const writeDataToFile = (data) => {
+  console.log(typeof data);
   fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 };
 
 // GET request to fetch all items
-app.get("/get-items", (request, response) => {
+app.get("/items", (request, response) => {
   const items = readDataFromFile();
   response.status(200).json(items);
 });
 
 // POST request to add a new item
-app.post("/post-items", (request, response) => {
+app.post("/items", (request, response) => {
   const newItem = {
     id: uuidv4(),
     ...request.body,
   };
-  if (!newItem.name || !newItem.description) {
-    return response
-      .status(400)
-      .json({ message: "Item must have a name and description" });
-  }
   const items = readDataFromFile();
   items.push(newItem);
   writeDataToFile(items);
@@ -43,6 +40,11 @@ app.post("/post-items", (request, response) => {
 app.put("/items/:id", (request, response) => {
   const { id } = request.params;
   const updatedItemBody = request.body;
+  if (!Object.keys(request.body).length) {
+    return response
+      .status(400)
+      .json({ message: "There is no update data provided" });
+  }
   const items = readDataFromFile();
   const updatedIndex = items.findIndex((item) => item.id === id);
   if (updatedIndex === -1)
@@ -53,7 +55,7 @@ app.put("/items/:id", (request, response) => {
 });
 
 // DELETE request to delete an exisiting item
-app.delete("/delete-items/:id", (request, response) => {
+app.delete("/items/:id", (request, response) => {
   const { id } = request.params;
 
   const items = readDataFromFile();
@@ -64,7 +66,7 @@ app.delete("/delete-items/:id", (request, response) => {
     return response.status(404).json({ message: "file was not found" });
 
   writeDataToFile(remainingItems);
-  response.status(204).json({ message: "item successfully deleted" });
+  response.status(200).json({ message: "item successfully deleted" });
 });
 
 app.listen(PORT, () => {
